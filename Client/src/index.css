@@ -1,0 +1,77 @@
+/* 1. External imports */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import "tailwindcss";
+
+/* 2. Base layer */
+@layer base {
+  body {
+    font-family: "Poppins", sans-serif;
+  }
+}
+
+/* 3. Theme (design tokens) */
+@theme {
+  /* ---------- Colors ---------- */
+  --color-brand-primary: #1663cc;
+  --color-btn-hover: #2570d4;
+  --color-btn-active: #1251a8;
+  --color-surface-app: #f5f5f5;
+  --color-search-icon: #cdced0;
+
+  --color-home-default: #98a2b3; /* Grayish Blue */
+
+  /* Status Colors */
+  --color-status-work: #242af9; /* Blue → Work / Info */
+  --color-status-personal: #8de88d; /* Green → Personal */
+  --color-status-urgent: #ff0033; /* Red → Urgent */
+  --color-status-completed: #757575; /* Gray → Completed */
+
+  --color-status-work-light: #d7d8fe; /* Light Blue → Work / Info */
+  --color-status-personal-light: #E5FAE5; /* Light Green*/
+  --color-status-urgent-light: #fae5ea; /* Light Red */
+  --color-status-completed-light: #cdced0; /* Light Gray */
+
+  --color-text-description: #757575; /* light Gray */
+
+  /* ---------- Text Sizes ---------- */
+  --text-h1: 2rem; /* 32px */
+  --text-h2: 1.25rem; /* 20px */
+  --text-h3: 1.5rem; /* 24px */
+  --text-h4: 1.75rem; /* 28px */
+
+  --text-body: 1rem; /* 16px */
+  --text-small: 0.75rem; /* 12px */
+
+  /*SPACING SYSTEM (4px grid)*/
+  --space-0: 0;
+  --space-1: 0.25rem; /* 4px */
+  --space-2: 0.5rem; /* 8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem; /* 16px */
+  --space-5: 1.25rem; /* 20px */
+  --space-6: 1.5rem; /* 24px */
+  --space-7: 1.75rem; /* 28px */
+  --space-8: 2rem; /* 32px */
+  --space-10: 2.5rem; /* 40px */
+  --space-11: 3rem; /* 44px */
+  --space-12: 3.5rem; /* 48px */
+  --space-13: 4rem; /* 52px */
+  --space-14: 4.5rem; /* 56px */
+  --space-15: 5rem; /* 60px */
+
+  /* radius */
+  --radius-none: 0;
+  --radius-sm: 0.25rem; /* 4px */
+  --radius-md: 0.5rem; /* 8px */
+  --radius-lg: 0.75rem; /* 12px */
+  --radius-xl: 1rem; /* 16px */
+  --radius-xxl: 1.5rem; /* 24px */
+  --radius-full: 9999px;
+
+  /* break points */
+  --breakpoint-mobile-base: 390px;
+  --breakpoint-mobile: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 1024px;
+  --breakpoint-desktop: 1280px;
+}
