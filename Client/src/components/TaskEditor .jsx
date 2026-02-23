@@ -1,53 +1,82 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useState } from "react";
 
-const AddCard = ({ isOpen, onClose, onAdd }) => {
+const TaskEditor = ({
+  isOpen,
+  onClose,
+  onAdd,
+  onUpdate,
+  isEditMode,
+  editTask,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("Work");
   const [dueDate, setDueDate] = useState("");
 
-const handleAddClick = async () => {
-  if (!title) return;
-
-  try {
-    const res = await fetch("http://localhost:3000/api/todos", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      credentials: "include", // VERY IMPORTANT
-      body: JSON.stringify({
-        title,
-        description,
-        category,
-        dueDate,
-      }),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok) {
-      alert(data.message || "Failed to add todo");
-      return;
+  // ✅ AUTO FILL WHEN EDITING
+  useEffect(() => {
+    if (isEditMode && editTask) {
+      setTitle(editTask.title || "");
+      setDescription(editTask.description || "");
+      setCategory(editTask.category || "Work");
+      setDueDate(editTask.dueDate ? editTask.dueDate.split("T")[0] : "");
     }
+  }, [isEditMode, editTask]);
 
-    onAdd(data.todo); // Add real DB data to UI
-    resetForm();
-    onClose();
-  } catch (err) {
-    console.error(err);
-    alert("Something went wrong");
-  }
-};
-
-  // reset form to default values
+  // ✅ RESET FORM
   const resetForm = () => {
     setTitle("");
     setDescription("");
     setCategory("Work");
     setDueDate("");
+  };
+
+  // ✅ UNIVERSAL SUBMIT (ADD + UPDATE)
+  const handleSubmit = async () => {
+    if (!title) return;
+
+    try {
+      const url = isEditMode
+        ? `http://localhost:3000/api/todos/${editTask._id}`
+        : "http://localhost:3000/api/todos";
+
+      const method = isEditMode ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          title,
+          description,
+          category,
+          dueDate,
+        }),
+      });
+
+      const data = await res.json();
+      console.log("API Response:", data.todo);
+
+      if (!res.ok) {
+        alert(data.message || "Something went wrong");
+        return;
+      }
+
+      if (isEditMode) {
+        onUpdate(data);
+      } else {
+        onAdd(data);
+      }
+
+      resetForm();
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    }
   };
 
   return (
@@ -61,18 +90,13 @@ const handleAddClick = async () => {
         pb-[52px]
         z-999
       "
-      /* start hidden */
       initial={{ y: "100vh" }}
-      /* open / close */
       animate={{ y: isOpen ? 0 : "100vh" }}
-      /* smooth motion */
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      /* DRAG SETTINGS */
       drag="y"
       dragConstraints={{ top: 0, bottom: 0 }}
       dragElastic={0.4}
       dragMomentum={false}
-      /* DRAG CLOSE LOGIC */
       onDragEnd={(event, info) => {
         if (info.offset.y > 120 || info.velocity.y > 500) {
           onClose();
@@ -84,7 +108,10 @@ const handleAddClick = async () => {
         <div className="h-1 w-10 rounded-full bg-gray-300" />
       </div>
 
-      <p className="pt-3 text-h3 font-semibold">Add New Task</p>
+      {/* 🔥 Dynamic Title */}
+      <p className="pt-3 text-h3 font-semibold">
+        {isEditMode ? "Update Task" : "Add New Task"}
+      </p>
 
       {/* Task title */}
       <div>
@@ -134,7 +161,7 @@ const handleAddClick = async () => {
       </div>
 
       {/* ACTION BUTTONS */}
-      <div className="grid grid-cols-2 gap-4 ">
+      <div className="grid grid-cols-2 gap-4">
         <button
           onClick={() => {
             resetForm();
@@ -146,14 +173,14 @@ const handleAddClick = async () => {
         </button>
 
         <button
-          onClick={handleAddClick}
+          onClick={handleSubmit}
           className="bg-brand-primary text-white rounded h-[52px] hover:bg-btn-hover"
         >
-          Add Task
+          {isEditMode ? "Update Task" : "Add Task"}
         </button>
       </div>
     </motion.div>
   );
 };
 
-export default AddCard;
+export default TaskEditor;
