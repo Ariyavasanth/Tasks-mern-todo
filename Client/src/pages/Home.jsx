@@ -4,11 +4,12 @@ import FilterButton from "../components/FilterButton";
 import Status from "../components/Staus";
 import TaskCard from "../components/TaskCard";
 import BottomNav from "../components/BottomNav";
-import TaskEditor  from "../components/TaskEditor ";
+import TaskEditor from "../components/TaskEditor ";
 import no_task from "../assets/home_page/no_task_added.svg";
 import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const [selectedFilter, setSelectedFilter] = useState("All");
   const [isOpen, setIsOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
 
@@ -17,6 +18,11 @@ const Home = () => {
   const [selectedTask, setSelectedTask] = useState(null);
 
   const navigate = useNavigate();
+
+  const filteredTasks =
+    selectedFilter === "All"
+      ? tasks
+      : tasks.filter((task) => task.category === selectedFilter);
 
   // DELETE
   const handleDeleteFromUI = (id) => {
@@ -29,15 +35,13 @@ const Home = () => {
   };
 
   // UPDATE
-const handleUpdateTask = (updatedTask) => {
-  setTasks((prev) =>
-    prev.map((task) =>
-      String(task._id) === String(updatedTask._id)
-        ? updatedTask
-        : task
-    )
-  );
-};
+  const handleUpdateTask = (updatedTask) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        String(task._id) === String(updatedTask._id) ? updatedTask : task,
+      ),
+    );
+  };
 
   // EDIT CLICK
   const handleEditClick = (task) => {
@@ -62,10 +66,8 @@ const handleUpdateTask = (updatedTask) => {
 
       setTasks((prev) =>
         prev.map((task) =>
-          task._id === id
-            ? { ...task, completed: !currentStatus }
-            : task
-        )
+          task._id === id ? { ...task, completed: !currentStatus } : task,
+        ),
       );
     } catch (err) {
       console.log(err);
@@ -102,39 +104,37 @@ const handleUpdateTask = (updatedTask) => {
         />
 
         <div className="flex gap-(--space-4) overflow-auto">
-          <FilterButton text="All Tasks" />
-          <FilterButton text="Personal" />
-          <FilterButton text="Urgent" />
-          <FilterButton text="Work" />
+          {["All", "Personal", "Urgent", "Work"].map((filter) => (
+            <FilterButton
+              key={filter}
+              text={filter}
+              isActive={selectedFilter === filter}
+              onClick={() => setSelectedFilter(filter)}
+            />
+          ))}
         </div>
 
         <h1 className="text-h2 font-bold mt-(--space-6)">Tasks</h1>
 
         {tasks.length === 0 && (
           <div className="mt-(--space-4)">
-            <img
-              src={no_task}
-              alt="No task"
-              className="w-64 mx-auto"
-            />
-            <p className="text-gray-400 text-center">
-              No task added yet.
-            </p>
+            <img src={no_task} alt="No task" className="w-64 mx-auto" />
+            <p className="text-gray-400 text-center">No task added yet.</p>
           </div>
         )}
 
-        {tasks.map((task) => (
+        {filteredTasks.map((task) => (
           <TaskCard
             key={task._id}
             task={task}
             onToggle={handleToggleComplete}
             onDelete={handleDeleteFromUI}
-            onEdit={handleEditClick}   // 👈 EDIT ADDED
+            onEdit={handleEditClick} // 👈 EDIT ADDED
           />
         ))}
       </div>
 
-      <TaskEditor 
+      <TaskEditor
         isOpen={isOpen}
         onAdd={handleAddTask}
         onUpdate={handleUpdateTask}
