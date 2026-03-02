@@ -18,6 +18,52 @@ const createRefreshToken = (user) => {
   );
 };
 
+// 🔁 REFRESH TOKEN API
+exports.refreshToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies?.refreshToken;
+
+    if (!refreshToken) {
+      return res.status(401).json({ message: "No refresh token" });
+    }
+
+    // Verify refresh token
+    const payload = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+
+    const user = await User.findById(payload.sub);
+
+    if (!user || user.refreshToken !== refreshToken) {
+      return res.status(401).json({ message: "Invalid refresh token" });
+    }
+
+    // 🔁 Rotate tokens
+    const newAccessToken = createAccessToken(user);
+    const newRefreshToken = createRefreshToken(user);
+
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    // Set cookies
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", newRefreshToken, {
+      httpOnly: true,
+      secure: false, // true in production (HTTPS)
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
+
+    res.json({ message: "Access token refreshed" });
+  } catch (error) {
+    return res.status(401).json({ message: "Refresh token expired" });
+  }
+};
+
 exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
   try {
@@ -75,14 +121,15 @@ exports.login = async (req, res) => {
     await user.save();
 
     res.cookie("accessToken", accessToken, {
-      httpOnly: false,
-      secure: false, //process.env.NODE_ENV === "production"
+      httpOnly: true,
+      secure: false, // true only in HTTPS production
       sameSite: "lax",
       maxAge: 15 * 60 * 1000,
     });
+
     res.cookie("refreshToken", refreshToken, {
-      httpOnly: false,
-      secure: false, //process.env.NODE_ENV === "production"
+      httpOnly: true,
+      secure: false,
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
@@ -143,25 +190,23 @@ exports.refreshToken = async (req, res) => {
 
 exports.logout = async (req, res) => {
   try {
-    const token = req.cookies?.refreshToken;
-    if (token) {
-      //find user and clear stored refresh token
-      try {
-        const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-        await User.findByIdAndUpdate(payload.sub, {
-          $unset: { refreshToken: 1 },
-        });
-      } catch (error) {
-        //token ivalid or expired - ignore
-      }
-    }
+    // Clear cookies
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: false, // true if using HTTPS
+      sameSite: "lax",
+      path: "/",     // must match cookie path
+    });
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+    });
 
-    //clear cookies
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.json({ message: "Logged out" });
-  } catch (error) {
-    console.error(error);
+    res.json({ message: "Logged out successfully" });
+  } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error" });
   }
 };

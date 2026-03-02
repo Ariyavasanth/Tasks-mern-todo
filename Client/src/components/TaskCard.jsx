@@ -6,6 +6,7 @@ import calander from "../assets/home_page/calender-icon.svg";
 import taskMenu from "../assets/bottom_menus/task_card_menu.svg";
 import { getBorderColor } from "../utils/taskStyles";
 import { formatDueDate } from "../utils/dateUtils";
+import { apiFetch } from "../api/apiFetch";
 
 const TaskCard = ({ task, onToggle, onDelete, onEdit }) => {
   const { title, description, category, dueDate, completed, _id } = task;
@@ -14,6 +15,8 @@ const TaskCard = ({ task, onToggle, onDelete, onEdit }) => {
   const [loading, setLoading] = useState(false);
 
   const menuRef = useRef(null);
+
+  
 
   const categoryStyles = {
     Work: {
@@ -52,14 +55,16 @@ const TaskCard = ({ task, onToggle, onDelete, onEdit }) => {
     try {
       setLoading(true);
 
-      const res = await fetch(`http://localhost:3000/api/todos/${_id}`, {
+      const res = await apiFetch(`http://localhost:3000/api/todos/${_id}`, {
         method: "DELETE",
         credentials: "include",
       });
       console.log("Delete Response:", res);
 
       if (!res.ok) {
-        throw new Error("Failed to delete");
+        const data = await res.json(); // 👈 read backend message
+        alert(data.message); // 👈 show REAL reason
+        return;
       }
 
       onDelete(_id); // update UI from parent

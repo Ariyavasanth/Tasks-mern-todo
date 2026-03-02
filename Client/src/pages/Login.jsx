@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { apiFetch } from "../api/apiFetch";
 
 const Login = () => {
   const [show, setShow] = useState(false);
@@ -38,7 +39,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/auth/login", {
+      const res = await apiFetch("http://localhost:3000/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -58,7 +59,7 @@ const Login = () => {
       setUser({ email }); // or data.user if backend sends user
 
       // ✅ Cookie already set by backend
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       console.error(error);
       alert("Something went wrong");

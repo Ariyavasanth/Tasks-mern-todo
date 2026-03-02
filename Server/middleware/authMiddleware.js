@@ -3,28 +3,57 @@ const User = require("../model/User");
 
 exports.protect = async (req, res, next) => {
   try {
-    console.log("=== PROTECT HIT ===");
-    const token = req.cookies?.accessToken || null;
+    const accessToken = req.cookies?.accessToken;
 
-    if (!token) return res.status(401).json({ message: "Not authenticated" });
-    // console.log("token:", token);
-
-    let payload;
-    try {
-      payload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    } catch (error) {
-      return res.status(401).json({ message: "Token invalid/expired" });
+    if (!accessToken) {
+      return res.status(401).json({ message: "Not authenticated" });
     }
 
-    const user = await User.findById(payload.sub);
-    // console.log("User found:", user);
-    if (!user) return res.status(401).json({ message: "User not found" });
+    try {
+      const payload = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
 
-    req.user = user;
-    // console.log("request:", req.user);
-    next();
+      const user = await User.findById(payload.sub);
+      if (!user) return res.status(401).json({ message: "User not found" });
+
+      req.user = user;
+      return next();
+    } catch (err) {
+      // Access token expired → try refresh
+      const refreshToken = req.cookies?.refreshToken;
+      if (!refreshToken)
+        return res.status(401).json({ message: "Session expired" });
+
+      try {
+        const payload = jwt.verify(
+          refreshToken,
+          process.env.JWT_REFRESH_SECRET,
+        );
+
+        const user = await User.findById(payload.sub);
+        if (!user || user.refreshToken !== refreshToken)
+          return res.status(401).json({ message: "Invalid refresh token" });
+
+        // Generate new access token
+        const newAccessToken = jwt.sign(
+          { sub: user._id, email: user.email },
+          process.env.JWT_ACCESS_SECRET,
+          { expiresIn: "15m" },
+        );
+
+        res.cookie("accessToken", newAccessToken, {
+          httpOnly: true,
+          secure: false,
+          sameSite: "lax",
+          maxAge: 15 * 60 * 1000,
+        });
+
+        req.user = user;
+        return next();
+      } catch (err) {
+        return res.status(401).json({ message: "Session expired" });
+      }
+    }
   } catch (error) {
-    console.error(error);
     res.status(500).json({ message: "Server error" });
   }
 };

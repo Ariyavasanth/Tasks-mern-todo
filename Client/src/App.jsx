@@ -1,41 +1,65 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { useContext } from "react";
+
 import ProtectedRoute from "./components/ProtuctedRoute.jsx";
+import LoginModal from "./components/LoginModal";
 
-import "./App.css";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Link,
-  useNavigate,
-} from "react-router-dom";
-
+import Profile from "./pages/Profile.jsx";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Home from "./pages/Home";
-import { AuthProvider } from "./context/AuthContext";
+import EditName from "./pages/EditName";
+
+import { AuthProvider, AuthContext } from "./context/AuthContext";
+
+const AppRoutes = () => {
+  const { showLoginModal, setShowLoginModal } =
+    useContext(AuthContext);
+
+  return (
+    <>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+
+        {/* Home is Public */}
+        <Route path="/" element={<Home />} />
+
+        {/* Protected Pages */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/edit-name"
+          element={
+            <ProtectedRoute>
+              <EditName />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+
+      {/* 🔥 GLOBAL LOGIN MODAL */}
+      <LoginModal
+        isOpen={showLoginModal}
+        onClose={() => setShowLoginModal(false)}
+      />
+    </>
+  );
+};
 
 function App() {
   return (
     <BrowserRouter>
-      <div>
-        <AuthProvider>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </AuthProvider>
-      </div>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
     </BrowserRouter>
   );
 }

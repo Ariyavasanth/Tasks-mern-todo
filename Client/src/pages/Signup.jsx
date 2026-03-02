@@ -42,7 +42,7 @@ const Signup = () => {
 
     // 2️⃣ API call
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await apiFetch("http://localhost:3000/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

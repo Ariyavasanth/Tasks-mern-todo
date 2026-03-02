@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { apiFetch } from "../api/apiFetch";
 
 const TaskEditor = ({
   isOpen,
@@ -43,7 +44,7 @@ const TaskEditor = ({
 
       const method = isEditMode ? "PUT" : "POST";
 
-      const res = await fetch(url, {
+      const res = await apiFetch(url, {
         method,
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +69,7 @@ const TaskEditor = ({
       if (isEditMode) {
         onUpdate(data);
       } else {
-        onAdd(data);
+        onAdd(data.todo);
       }
 
       resetForm();

@@ -1,30 +1,55 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../components/Navbar";
 import FilterButton from "../components/FilterButton";
-import Status from "../components/Staus";
+import Status from "../components/Status.jsx";
 import TaskCard from "../components/TaskCard";
 import BottomNav from "../components/BottomNav";
-import TaskEditor from "../components/TaskEditor ";
+import TaskEditor from "../components/TaskEditor";
 import no_task from "../assets/home_page/no_task_added.svg";
-import { useNavigate } from "react-router-dom";
+
+import { AuthContext } from "../context/AuthContext";
+import { apiFetch } from "../api/apiFetch";
 
 const Home = () => {
+  const { requireAuth } = useContext(AuthContext);
+
   const [selectedFilter, setSelectedFilter] = useState("All");
   const [isOpen, setIsOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
 
-  // 🔥 NEW STATES FOR EDIT
   const [isEditMode, setIsEditMode] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
 
-  const navigate = useNavigate();
+  // 🔥 FETCH TASKS (Public Home – no redirect)
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const res = await apiFetch("http://localhost:3000/api/todos/", {
+          credentials: "include",
+        });
+
+        if (res.status === 401) {
+          // Not logged in → just show empty tasks
+          setTasks([]);
+          return;
+        }
+
+        const data = await res.json();
+        setTasks(data);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchTasks();
+  }, []);
 
   const filteredTasks =
     selectedFilter === "All"
       ? tasks
       : tasks.filter((task) => task.category === selectedFilter);
 
-  // DELETE
+  // DELETE (UI only)
   const handleDeleteFromUI = (id) => {
     setTasks((prev) => prev.filter((task) => task._id !== id));
   };
@@ -38,60 +63,52 @@ const Home = () => {
   const handleUpdateTask = (updatedTask) => {
     setTasks((prev) =>
       prev.map((task) =>
-        String(task._id) === String(updatedTask._id) ? updatedTask : task,
-      ),
+        String(task._id) === String(updatedTask._id)
+          ? updatedTask
+          : task
+      )
     );
   };
 
-  // EDIT CLICK
+  // EDIT CLICK (Protected)
   const handleEditClick = (task) => {
-    setSelectedTask(task);
-    setIsEditMode(true);
-    setIsOpen(true);
+    requireAuth(() => {
+      setSelectedTask(task);
+      setIsEditMode(true);
+      setIsOpen(true);
+    });
   };
 
-  // TOGGLE COMPLETE
-  const handleToggleComplete = async (id, currentStatus) => {
-    try {
-      const res = await fetch(`http://localhost:3000/api/todos/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({
-          completed: !currentStatus,
-        }),
-      });
+  // TOGGLE COMPLETE (Protected)
+  const handleToggleComplete = (id, currentStatus) => {
+    requireAuth(async () => {
+      try {
+        const res = await apiFetch(
+          `http://localhost:3000/api/todos/${id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+              completed: !currentStatus,
+            }),
+          }
+        );
 
-      if (!res.ok) return;
+        if (!res.ok) return;
 
-      setTasks((prev) =>
-        prev.map((task) =>
-          task._id === id ? { ...task, completed: !currentStatus } : task,
-        ),
-      );
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  // FETCH TASKS
-  useEffect(() => {
-    const fetchTasks = async () => {
-      const res = await fetch("http://localhost:3000/api/todos/", {
-        credentials: "include",
-      });
-
-      if (res.status === 401) {
-        navigate("/login");
-        return;
+        setTasks((prev) =>
+          prev.map((task) =>
+            task._id === id
+              ? { ...task, completed: !currentStatus }
+              : task
+          )
+        );
+      } catch (err) {
+        console.log(err);
       }
-
-      const data = await res.json();
-      setTasks(data);
-    };
-
-    fetchTasks();
-  }, []);
+    });
+  };
 
   return (
     <div className="bg-surface-app h-screen pb-24 overflow-y-auto">
@@ -119,7 +136,9 @@ const Home = () => {
         {tasks.length === 0 && (
           <div className="mt-(--space-4)">
             <img src={no_task} alt="No task" className="w-64 mx-auto" />
-            <p className="text-gray-400 text-center">No task added yet.</p>
+            <p className="text-gray-400 text-center">
+              No task added yet.
+            </p>
           </div>
         )}
 
@@ -129,7 +148,7 @@ const Home = () => {
             task={task}
             onToggle={handleToggleComplete}
             onDelete={handleDeleteFromUI}
-            onEdit={handleEditClick} // 👈 EDIT ADDED
+            onEdit={handleEditClick}
           />
         ))}
       </div>
@@ -149,9 +168,11 @@ const Home = () => {
 
       <BottomNav
         onAddClick={() => {
-          setIsEditMode(false);
-          setSelectedTask(null);
-          setIsOpen(true);
+          requireAuth(() => {
+            setIsEditMode(false);
+            setSelectedTask(null);
+            setIsOpen(true);
+          });
         }}
       />
     </div>
