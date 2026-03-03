@@ -4,16 +4,16 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-
+const path = require("path");
 const app = express();
 connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend URL
+    origin: process.env.NODE_ENV === "production" ? "https://your-deployed-frontend.com" : "http://localhost:5173",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
-  }),
+  })
 );
 
 // ✅ cookies first
@@ -34,6 +34,15 @@ app.use("/api/auth", authRoutes);
 app.use("/api/todos", require("./routes/todoRoutes"));
 
 PORT = process.env.PORT || 5000;
+
+// Serve React frontend in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "client/build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 app.listen(PORT, () => {
   console.log("Your port is listening", PORT);
 });

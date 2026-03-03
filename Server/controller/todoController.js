@@ -27,6 +27,18 @@ exports.createTodo = async (req, res) => {
   }
 };
 
+exports.test = async (req, res) => {
+  try {
+    await Todo.create({
+      title: "Test Todo",
+      completed: false,
+    });
+    res.json({ message: "Test todo created" });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};
+
 // GET ALLL TODOS OF LOGGED IN USER and also for category and completed
 exports.getTodos = async (req, res) => {
   try {
