@@ -39,7 +39,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const res = await apiFetch("http://localhost:3000/api/auth/login", {
+      const res = await apiFetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -55,7 +55,7 @@ const TaskCard = ({ task, onToggle, onDelete, onEdit }) => {
     try {
       setLoading(true);
 
-      const res = await apiFetch(`http://localhost:3000/api/todos/${_id}`, {
+      const res = await apiFetch(`/api/todos/${_id}`, {
         method: "DELETE",
         credentials: "include",
       });

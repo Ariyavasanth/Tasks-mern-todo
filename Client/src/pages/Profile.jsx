@@ -8,7 +8,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/auth/me", {
+        const res = await fetch("/api/auth/me", {
           credentials: "include",
         });
 
@@ -30,7 +30,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:3000/api/auth/logout", {
+      await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include", // important to send cookies
       });

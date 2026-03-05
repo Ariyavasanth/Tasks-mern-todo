@@ -9,7 +9,7 @@ export const apiFetch = async (url, options = {}) => {
   // If access token expired
   if (res.status === 401) {
     const refreshRes = await fetch(
-      "http://localhost:3000/api/auth/refresh",
+      "/api/auth/refresh",
       {
         method: "POST",
         credentials: "include",

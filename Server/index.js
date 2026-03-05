@@ -10,10 +10,10 @@ connectDB();
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? "https://your-deployed-frontend.com" : "http://localhost:5173",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: true,
+    
     credentials: true,
-  })
+  }),
 );
 
 // ✅ cookies first
@@ -33,7 +33,7 @@ app.use("/api/auth", authRoutes);
 // TODO middleware
 app.use("/api/todos", require("./routes/todoRoutes"));
 
-PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 
 // Serve React frontend in production
 if (process.env.NODE_ENV === "production") {

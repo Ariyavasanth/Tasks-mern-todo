@@ -39,8 +39,8 @@ const TaskEditor = ({
 
     try {
       const url = isEditMode
-        ? `http://localhost:3000/api/todos/${editTask._id}`
-        : "http://localhost:3000/api/todos";
+        ? `/api/todos/${editTask._id}`
+        : "/api/todos";
 
       const method = isEditMode ? "PUT" : "POST";
 

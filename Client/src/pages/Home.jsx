@@ -24,7 +24,7 @@ const Home = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const res = await apiFetch("http://localhost:3000/api/todos/", {
+        const res = await apiFetch("/api/todos/", {
           credentials: "include",
         });
 
@@ -84,7 +84,7 @@ const Home = () => {
     requireAuth(async () => {
       try {
         const res = await apiFetch(
-          `http://localhost:3000/api/todos/${id}`,
+          `/api/todos/${id}`,
           {
             method: "PUT",
             headers: { "Content-Type": "application/json" },

@@ -9,7 +9,7 @@ const EditName = () => {
   // 🔹 Fetch current user
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("http://localhost:3000/api/auth/me", {
+      const res = await fetch("/api/auth/me", {
         credentials: "include",
       });
 
@@ -30,7 +30,7 @@ const EditName = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("http://localhost:3000/api/profile/details", {
+      const res = await fetch("/api/profile/details", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
 
   const checkUser = async () => {
     try {
-      const res = await apiFetch("http://localhost:3000/api/auth/me", {
+      const res = await apiFetch("/api/auth/me", {
         credentials: "include",
       });
 
