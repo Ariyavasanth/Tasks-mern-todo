@@ -10,8 +10,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: true,
-    
+    origin: "https://ariya-tasks-bmj0oouue-ariyas-projects-4100aac3.vercel.app/",
     credentials: true,
   }),
 );
