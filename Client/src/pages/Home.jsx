@@ -8,7 +8,7 @@ import TaskEditor from "../components/TaskEditor";
 import no_task from "../assets/home_page/no_task_added.svg";
 
 import { AuthContext } from "../context/AuthContext";
-import { apiFetch } from "../api/apiFetch";
+import { apiFetch } from "../api/apiFetch.js";
 
 const Home = () => {
   const { requireAuth } = useContext(AuthContext);

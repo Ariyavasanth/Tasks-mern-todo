@@ -1,4 +1,4 @@
-import { apiFetch } from "../utils/apiFetch";
+import { apiFetch } from "../api/apiFetch.js";
 
 useEffect(() => {
   const fetchUser = async () => {

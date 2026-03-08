@@ -3,6 +3,7 @@ import Lottie from "lottie-react";
 import SignupAnimation from "../assets/Signup.json";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../api/apiFetch.js";
 
 const Signup = () => {
   const navigate = useNavigate();

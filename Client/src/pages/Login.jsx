@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
-import { apiFetch } from "../api/apiFetch";
+import { apiFetch } from "../api/apiFetch.js";
 
 const Login = () => {
   const [show, setShow] = useState(false);
