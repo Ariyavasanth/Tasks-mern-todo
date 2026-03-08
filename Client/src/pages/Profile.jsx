@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { apiFetch } from "../utils/apiFetch";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -8,9 +9,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/auth/me", {
-          credentials: "include",
-        });
+        const res = await apiFetch("/api/auth/me");
 
         if (!res.ok) {
           navigate("/login");
@@ -30,7 +29,7 @@ const Profile = () => {
 
   const handleLogout = async () => {
     try {
-      await fetch("/api/auth/logout", {
+      await apiFetch("/api/auth/logout", {
         method: "POST",
         credentials: "include", // important to send cookies
       });

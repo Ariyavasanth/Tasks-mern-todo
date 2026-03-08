@@ -16,10 +16,12 @@ export const apiFetch = async (url, options = {}) => {
     const refreshRes = await fetch(`${BASE_URL}/api/auth/refresh`, {
       method: "POST",
       credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
     });
 
     if (refreshRes.ok) {
-      // retry original request
       res = await fetch(`${BASE_URL}${url}`, {
         ...options,
         credentials: "include",
