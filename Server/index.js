@@ -10,7 +10,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "https://ariya-tasks-bmj0oouue-ariyas-projects-4100aac3.vercel.app",
+    origin: true,
     credentials: true,
   }),
 );
@@ -22,6 +22,10 @@ app.use(express.json());
 
 // FIX: JSON + URL encoded should be ABOVE all routes
 app.use(express.urlencoded({ extended: true }));
+
+app.get("/", (req, res) => {
+  res.send("API running successfully");
+});
 
 // profile route (multer works correctly now)
 app.use("/api/profile", require("./routes/profileRoutes"));
