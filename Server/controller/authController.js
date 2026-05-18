@@ -101,7 +101,12 @@ exports.login = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ message: "Logged in" });
+    res.json({
+      message: "Logged in",
+      accessToken,
+      refreshToken,
+      user: { id: user._id, name: user.name, email: user.email }
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
@@ -110,7 +115,7 @@ exports.login = async (req, res) => {
 
 exports.refreshToken = async (req, res) => {
   try {
-    const token = req.cookies?.refreshToken;
+    const token = req.cookies?.refreshToken || req.body.refreshToken;
     if (!token) return res.status(401).json({ message: "No refresh token" });
 
     //verify refresh token
@@ -152,7 +157,11 @@ exports.refreshToken = async (req, res) => {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.json({ message: "Token refreshed" });
+    res.json({
+      message: "Token refreshed",
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

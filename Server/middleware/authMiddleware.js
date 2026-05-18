@@ -3,7 +3,12 @@ const User = require("../model/User");
 
 exports.protect = async (req, res, next) => {
   try {
-    const accessToken = req.cookies?.accessToken;
+    let accessToken = req.cookies?.accessToken;
+
+    // Check if the token is sent in the Authorization header
+    if (!accessToken && req.headers.authorization?.startsWith("Bearer ")) {
+      accessToken = req.headers.authorization.split(" ")[1];
+    }
 
     if (!accessToken) {
       return res.status(401).json({ message: "Not authenticated" });
