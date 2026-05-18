@@ -31,16 +31,19 @@ const Profile = () => {
     try {
       await apiFetch("/api/auth/logout", {
         method: "POST",
-        credentials: "include", // important to send cookies
       });
+    } catch (error) {
+      console.error("Logout failed:", error);
+    } finally {
+      // Clear saved tokens from local storage
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
 
       // Clear React state
       setUser(null);
 
       // Redirect to login
       navigate("/login");
-    } catch (error) {
-      console.error("Logout failed:", error);
     }
   };
 

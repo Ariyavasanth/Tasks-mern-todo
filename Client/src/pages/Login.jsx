@@ -55,10 +55,13 @@ const Login = () => {
         return;
       }
 
-      // ✅ SET USER BEFORE NAVIGATION
-      setUser({ email }); // or data.user if backend sends user
+      // Save the login tokens to local storage
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
 
-      // ✅ Cookie already set by backend
+      // Set the user in the React context
+      setUser(data.user);
+
       navigate("/");
     } catch (error) {
       console.error(error);
