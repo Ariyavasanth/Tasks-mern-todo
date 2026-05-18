@@ -21,8 +21,10 @@ const createRefreshToken = (user) => {
 
 
 exports.signup = async (req, res) => {
-  const { name, email, password } = req.body;
   try {
+    const { name, password } = req.body;
+    const email = req.body.email?.trim().toLowerCase();
+
     //validate input
     if (!name || !email || !password) {
       return res
@@ -51,13 +53,18 @@ exports.signup = async (req, res) => {
     res.status(201).json({ message: "Signup successful" });
   } catch (error) {
     console.log("Signup Error:", error);
+    if (error.code === 11000) {
+      return res.status(409).json({ message: "Email already registered" });
+    }
     res.status(500).json({ message: "Server error" });
   }
 };
 
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { password } = req.body;
+    const email = req.body.email?.trim().toLowerCase();
+
     if (!email || !password)
       return res.status(400).json({ message: "Missing fields" });
 
