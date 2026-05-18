@@ -12,12 +12,24 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   "http://localhost:5173",
   "http://localhost:3000",
-  "https://dreamy-torrone-bff371.netlify.app/"
-].filter(Boolean);
+  "https://dreamy-torrone-bff371.netlify.app"
+].filter(Boolean).map(origin => origin.replace(/\/$/, ""));
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" ? allowedOrigins : true,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const normalizedOrigin = origin.replace(/\/$/, "");
+      if (process.env.NODE_ENV === "production") {
+        if (allowedOrigins.includes(normalizedOrigin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      } else {
+        callback(null, true);
+      }
+    },
     credentials: true,
   }),
 );
