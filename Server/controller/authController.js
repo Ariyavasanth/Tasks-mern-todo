@@ -89,6 +89,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       secure: isSecure,
       sameSite: isSecure ? "none" : "lax",
+      path: "/",
       maxAge: 15 * 60 * 1000,
     });
 
@@ -96,6 +97,7 @@ exports.login = async (req, res) => {
       httpOnly: true,
       secure: isSecure,
       sameSite: isSecure ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
@@ -138,6 +140,7 @@ exports.refreshToken = async (req, res) => {
       httpOnly: true,
       secure: isSecure,
       sameSite: isSecure ? "none" : "lax",
+      path: "/",
       maxAge: 15 * 60 * 1000,
     });
 
@@ -145,6 +148,7 @@ exports.refreshToken = async (req, res) => {
       httpOnly: true,
       secure: isSecure,
       sameSite: isSecure ? "none" : "lax",
+      path: "/",
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 

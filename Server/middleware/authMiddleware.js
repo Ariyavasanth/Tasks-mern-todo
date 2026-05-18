@@ -46,6 +46,7 @@ exports.protect = async (req, res, next) => {
           httpOnly: true,
           secure: isSecure,
           sameSite: isSecure ? "none" : "lax",
+          path: "/",
           maxAge: 15 * 60 * 1000,
         });
 
