@@ -40,12 +40,12 @@ exports.protect = async (req, res, next) => {
           { expiresIn: "15m" },
         );
 
-        const isProduction = process.env.NODE_ENV === "production";
+        const isSecure = req.secure || req.headers["x-forwarded-proto"] === "https";
 
         res.cookie("accessToken", newAccessToken, {
           httpOnly: true,
-          secure: isProduction,
-          sameSite: isProduction ? "none" : "lax",
+          secure: isSecure,
+          sameSite: isSecure ? "none" : "lax",
           maxAge: 15 * 60 * 1000,
         });
 
